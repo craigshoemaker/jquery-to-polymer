@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../../styles/slidernav.css" type="text/css" />
+    </head>
+    <body>
+        <div data-role="slidernav-container">
+            <div data-role="slidernav-root">
+                <h2>Product Help</h2>
+            </div>
+        </div>
+        <script src="../../data/toc.js" type="text/javascript"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" type="text/javascript"></script>
+        <script src="slidernav.jquery.js" type="text/javascript"></script>
+        <script>
+            $(function() {
+
+                setTimeout(function() {
+
+                    sliderNav.init(window.toc, function(e, args) {
+                        console.log(e);
+                        console.log(args);
+                    });
+                }, 1000); // simulate Ajax call
+            });
+        </script>
+    </body>
+</html>
