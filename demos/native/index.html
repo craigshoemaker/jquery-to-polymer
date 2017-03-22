@@ -8,21 +8,16 @@
     <body>
         <div data-role="slidernav-container">
             <div data-role="slidernav-root">
-                <h2>Product Help</h2>
+                <h2>Table of Contents</h2>
             </div>
         </div>
         <script src="../../data/toc.js" type="text/javascript"></script>
         <script src="slidernav.js" type="text/javascript"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() { 
-
-                setTimeout(function() {
-
-                    sliderNav.init(window.toc, function(e, args) {
-                        console.log(e);
-                        console.log(args);
-                    });
-                }, 1000); // simulate Ajax call
+                sliderNav.init(window.toc, function(e, args) {
+                    console.log(e, args);
+                });
             }, false);
         </script>
     </body>

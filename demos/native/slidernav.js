@@ -1,11 +1,32 @@
 (function(window, document){
 
+    'use strict';
+
     var module = {
 
         navContainer: null,
         id: 0,
         toc: {},
         individualItemCallback: function() {},
+
+        getItems: function(path, parent) {
+            
+            // clone path
+            path = JSON.parse(JSON.stringify(path));
+
+            var isRoot, level;
+            path.forEach(function(pathIndex, loopIndex) {
+                isRoot = loopIndex === 0;
+
+                if(isRoot){
+                    level = parent[pathIndex];
+                } else {
+                    level = level.children[pathIndex];
+                }
+            });
+
+            return level.children;
+        },
 
         bindLayer: function(layer, tocPath) {
             var items, path;
@@ -15,7 +36,7 @@
                 path = [];
             } else {
                 path = tocPath.toString().split(',');
-                items = eval(('module.toc[' + path.join('].children[') + '].children').replace('[].children', ''));
+                items = module.getItems(path, module.toc);
             }
 
             items.forEach(function(item, index) {

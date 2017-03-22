@@ -12,20 +12,17 @@
         <link rel="import" href="slider-nav/index.html" id="slider-nav" />
     </head>
     <body>
-        <slider-nav id="slider" title="Product Help" />
+        <slider-nav id="slider" title="Table of Contents" />
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
                 var slider = document.getElementById('slider');
 
                 slider.addEventListener('itemselected', function(e){
-                    console.log(e.detail.ui);
-                    console.log(e.detail.data);
+                    console.log(e.detail.ui, args.detail.data);
                 });
 
-                setTimeout(function() {
-                    slider.dispatchEvent(new CustomEvent('data', { detail: window.toc }));
-                }, 1000); // simulate Ajax call
+                slider.dispatchEvent(new CustomEvent('data', { detail: window.toc }));
  
             });
         </script>

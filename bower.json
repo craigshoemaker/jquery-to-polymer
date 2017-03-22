@@ -1,0 +1,21 @@
+{
+  "name": "slider-nav-demo",
+  "authors": [
+    "Craig Shoemaker <craig@craigshoemaker.net>"
+  ],
+  "description": "slider-nav Demos",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.7.0"
+  }
+}
