@@ -16,7 +16,7 @@
 
             var isRoot, level;
             path.forEach(function(pathIndex, loopIndex) {
-                isRoot = loopIndex === 0;
+                isRoot = (loopIndex === 0);
 
                 if(isRoot){
                     level = parent[pathIndex];
