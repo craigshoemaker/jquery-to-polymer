@@ -13,8 +13,8 @@
     transition: .35s;
     overflow: auto;
     padding: 10px;
-    color: #666;
-    background-color: #eee;
+    color: #eee;
+    background-color: #333;
 }
 
 .slidernav-layer {
@@ -27,7 +27,7 @@
 
 [data-role="slidernav-container"] [data-role="close-layer"]:hover,
 .slidernav-item:hover {
-    background-color: #ccc;
+    background-color: #999;
 }
 
 .slidernav-item {

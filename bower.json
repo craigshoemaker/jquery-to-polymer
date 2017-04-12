@@ -16,6 +16,10 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.7.0"
+    "polymer": "Polymer/polymer#2.0.0-rc.3",
+    "bootstrap": "^3.3.7"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^v1.0.0-rc.5"
   }
 }

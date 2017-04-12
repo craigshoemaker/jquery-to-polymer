@@ -1,0 +1,68 @@
+<script src="slidernav.js" type="text/javascript"></script>
+
+<template>
+    <style>
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        [data-role="container"],
+        .layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 300px;
+            font-size: 1em;
+            transition: .35s;
+            overflow: auto;
+            padding: 10px;
+            color: #eee;
+            background-color: var(--slider-nav-background-color, #333);
+        }
+
+        .layer {
+            margin-left: -350px;
+        }
+
+        .show {
+            margin-left: 0;
+        }
+
+        [data-role="container"] [data-role="close-layer"]:hover,
+        .item:hover {
+            background-color: #999;
+        }
+
+        .item {
+            cursor: pointer;
+            padding: 4px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .item-selected {
+            background-color: #666;
+        }
+
+        [data-role="container"] div[data-parent="true"]::before {
+            content: "» ";
+        }
+
+        .left-arrow::after {
+            content: "« ";
+        }
+
+        [data-role="container"] [data-role="close-layer"] {
+            padding:10px;
+            border-bottom: solid 1px #999;
+        }
+
+    </style>
+    <div data-role="container">
+        <div data-role="root">
+            <h2 id="title"></h2>
+        </div>
+    </div>
+</template>

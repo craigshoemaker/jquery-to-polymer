@@ -1,0 +1,263 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<dom-module id="slider-nav">
+
+    <template>
+        <style>
+        .pointer {
+            cursor: pointer;
+        }
+
+        [data-role="container"],
+        .layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 300px;
+            font-size: 1em;
+            transition: .35s;
+            overflow: auto;
+            padding: 10px;
+            color: #eee;
+            background-color: var(--slider-nav-background-color, #333);
+        }
+
+        .layer {
+            margin-left: -350px;
+        }
+
+        .show {
+            margin-left: 0;
+        }
+
+        [data-role="container"] [data-role="close-layer"]:hover,
+        .item:hover {
+            background-color: #999;
+        }
+
+        .item {
+            cursor: pointer;
+            padding: 4px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .item-selected {
+            background-color: #666;
+        }
+
+        [data-role="container"] div[data-parent="true"]::before {
+            content: "» ";
+        }
+
+        .left-arrow::after {
+            content: "« ";
+        }
+
+        [data-role="container"] [data-role="close-layer"] {
+            padding:10px;
+            border-bottom: solid 1px #999;
+        }
+        </style>
+        <div data-role="container" on-click="click">
+            <div data-role="root">
+                <h2 id="title">[[title]]</h2>
+            </div>
+        </div>
+    </template>
+    
+
+</dom-module>
+
+<script>
+    (function(window, document){
+
+        'use strict';
+
+            class SliderNav extends Polymer.Element {
+
+                static get is() { return 'slider-nav'; }
+
+                static get properties() {
+                    return {
+                        title: String
+                    };
+                }
+
+                ready() {
+                    super.ready();
+                    console.log('ready');
+                }
+
+                getItems(path, parent) {
+                    
+                    // clone path
+                    path = JSON.parse(JSON.stringify(path));
+
+                    var isRoot, level;
+                    path.forEach(function(pathIndex, loopIndex) {
+                        isRoot = (loopIndex === 0);
+
+                        if(isRoot){
+                            level = parent[pathIndex];
+                        } else {
+                            level = level.children[pathIndex];
+                        }
+                    });
+
+                    return level.children;
+                }
+
+                bindLayer(layer, tocPath) {
+                    var items, path;
+
+                    if(!this._toc) {
+                        return;
+                    }
+
+                    if(!tocPath) {
+                        items = this._toc;
+                        path = [];
+                    } else {
+                        path = tocPath.toString().split(',');
+                        items = this.getItems(path, this._toc);
+                    }
+
+                    items.forEach(function(item, index) {
+                        var newPath = path.concat([String(index)]);
+                        var isParent = false;
+
+                        if(item.children) {
+                            isParent = item.children.length > 0;
+                        }
+
+                        var itemElement = document.createElement('DIV');
+                        itemElement.setAttribute('data-parent', isParent.toString());
+                        itemElement.setAttribute('data-toc-path', newPath.join(','));
+                        itemElement.setAttribute('data-name', item.fileName);
+                        itemElement.setAttribute('title', item.title);
+                        itemElement.setAttribute('class', 'item');
+                        itemElement.innerText = item.title;
+
+                        Polymer.dom(layer).appendChild(itemElement);
+                    });
+
+                    return layer;
+                }
+
+                addLayer(tocPath, parentTitle) {
+                    this._id++;
+
+                    var layerId = 'layer-' + this._id;
+
+                    var layer = document.createElement('DIV');
+                    layer.setAttribute('id', layerId);
+                    layer.setAttribute('data-toc-path', tocPath);
+                    layer.style.zIndex = (this._id + 100);
+                    layer.classList.add('layer');
+
+                    var closeButton = document.createElement('DIV');
+                    closeButton.classList.add('pointer');
+                    closeButton.setAttribute('data-role', 'close-layer');
+                    closeButton.setAttribute('title', parentTitle);
+                    closeButton.innerHTML = '<span class="left-arrow"></span>' + parentTitle;
+
+                    Polymer.dom(layer).appendChild(closeButton);
+
+                    layer = this.bindLayer(layer, tocPath);
+
+                    Polymer.dom(this._navContainer).appendChild(layer);
+
+                    var root = this.shadowRoot;
+
+                    setTimeout(function() {
+                        root.querySelector('#' + layerId).classList.add('show');
+                    }, 0);
+                }
+
+                hideLayer(e) {
+                    var parentSelector = '#' + e.target.parentElement.getAttribute('id');
+                    var parent = this.shadowRoot.querySelector(parentSelector);
+                    parent.classList.remove('show');
+
+                    var parentTocPath = parent.getAttribute('data-toc-path');
+                    this.removeLastLayer(parentTocPath);
+                }
+
+                removeLastLayer(parentTocPath) {
+                    var container = this._navContainer;
+                    setTimeout(function() {
+                        var layerToRemove = container.querySelector('.layer[data-toc-path^="' + parentTocPath + '"]');
+                        Polymer.dom(container).removeChild(layerToRemove);
+                    }, 1000); // allow enough time for close animation to complete
+                }
+
+                parentClick(e){
+                    var target = e.target;
+
+                    var selectedItems = target.parentElement.querySelector('.item-selected');
+                    if(selectedItems) {
+                        selectedItems.classList.remove('item-selected');
+                    }
+
+                    target.classList.add('item-selected');
+
+                    var title = target.innerText; 
+                    this.addLayer(target.getAttribute('data-toc-path'), title);
+                }
+
+                itemClick(e){
+                    var target = e.target;
+
+                    var selected = target.parentElement.querySelectorAll('.item-selected');
+                    
+                    if(selected && selected.length > 0) {
+                        [].forEach.call(selected, function(item) {
+                            item.classList.remove('item-selected');
+                        });
+                    }
+
+                    target.classList.add('item-selected');
+
+                    var args = {
+                        tocPath: target.getAttribute('data-toc-path'),
+                        fileName: target.getAttribute('data-name'),
+                        title: target.innerText
+                    };
+
+                    var event = new CustomEvent('itemselected', { 
+                        detail: {
+                            ui: e, 
+                            data: args
+                        }
+                    });
+
+                    this.dispatchEvent(event);
+                }
+
+                click(e) {
+                    var currentTarget = e.target;
+
+                    if(currentTarget.getAttribute('data-role') === 'close-layer') {
+                        this.hideLayer(e);
+                    } else if(currentTarget.getAttribute('data-parent') === 'false') {
+                        this.itemClick(e);
+                    } else if(currentTarget.getAttribute('data-parent') === 'true') {
+                        this.parentClick(e);
+                    }
+                }
+
+                init(toc) {
+                    this._navContainer =  this.shadowRoot.querySelector('div[data-role="container"]');
+                    this._toc = toc;
+                    this._id = 0;
+
+                    this.bindLayer(this._navContainer.querySelector('div[data-role="root"]'));
+                }
+        }
+
+        window.customElements.define(SliderNav.is, SliderNav);
+
+    }(window, document));
+</script>
