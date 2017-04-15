@@ -63,11 +63,35 @@
         <div data-role="container" on-click="click">
             <div data-role="root">
                 <h2 id="title">[[title]]</h2>
+
+                <template is="dom-repeat" items="{{rootItems}}">
+                    <div class="item"
+                         data-parent$="{{item.isParent}}"
+                         data-toc-path$="{{item.path}}"
+                         data-name$="{{item.fileName}}"
+                         title="{{item.title}}">{{item.title}}</div>
+                </template>
+
+                <template id="layer-template" is="dom-repeat" items="{{layers}}" as="layer">
+                    <div id="layer-{{layer.id}}" data-toc-path$="{{layer.path}}" class="layer" style="z-index: {{layer.zIndex}};">
+                        <div class="pointer" data-role="close-layer" title="{{layer.title}}">
+                            <span class="left-arrow"></span> {{layer.title}}
+                        </div>
+
+                        <template is="dom-repeat" as="layerItem" items={{layer.items}}>
+                            <div class="item"
+                                 data-parent$="{{layerItem.isParent}}"
+                                 data-toc-path$="{{layerItem.path}}"
+                                 data-name$="{{layerItem.fileName}}"
+                                 title="{{layerItem.title}}">{{layerItem.title}}</div>
+                        </template>
+
+                    </div>
+                </template>
+
             </div>
         </div>
     </template>
-    
-
 </dom-module>
 
 <script>
@@ -75,189 +99,183 @@
 
         'use strict';
 
-            class SliderNav extends Polymer.Element {
+        class SliderNav extends Polymer.Element {
+            
+            static get is() { return 'slider-nav'; }
 
-                static get is() { return 'slider-nav'; }
+            static get properties() {
+                return {
+                    title: String
+                };
+            }
 
-                static get properties() {
-                    return {
-                        title: String
-                    };
-                }
+            getItems(path, parent) {
+                
+                // clone path
+                path = JSON.parse(JSON.stringify(path));
 
-                ready() {
-                    super.ready();
-                    console.log('ready');
-                }
+                var isRoot, level;
+                path.forEach(function(pathIndex, loopIndex) {
+                    isRoot = (loopIndex === 0);
 
-                getItems(path, parent) {
-                    
-                    // clone path
-                    path = JSON.parse(JSON.stringify(path));
-
-                    var isRoot, level;
-                    path.forEach(function(pathIndex, loopIndex) {
-                        isRoot = (loopIndex === 0);
-
-                        if(isRoot){
-                            level = parent[pathIndex];
-                        } else {
-                            level = level.children[pathIndex];
-                        }
-                    });
-
-                    return level.children;
-                }
-
-                bindLayer(layer, tocPath) {
-                    var items, path;
-
-                    if(!this._toc) {
-                        return;
-                    }
-
-                    if(!tocPath) {
-                        items = this._toc;
-                        path = [];
+                    if(isRoot){
+                        level = parent[pathIndex];
                     } else {
-                        path = tocPath.toString().split(',');
-                        items = this.getItems(path, this._toc);
+                        level = level.children[pathIndex];
                     }
+                });
 
-                    items.forEach(function(item, index) {
-                        var newPath = path.concat([String(index)]);
-                        var isParent = false;
+                return level.children;
+            }
 
-                        if(item.children) {
-                            isParent = item.children.length > 0;
-                        }
+            addLayer(path, title) {
+                var   layer = {}
+                    , items
+                    , layerId
+                    , thisRoot
+                    , tocPath
+                ;
 
-                        var itemElement = document.createElement('DIV');
-                        itemElement.setAttribute('data-parent', isParent.toString());
-                        itemElement.setAttribute('data-toc-path', newPath.join(','));
-                        itemElement.setAttribute('data-name', item.fileName);
-                        itemElement.setAttribute('title', item.title);
-                        itemElement.setAttribute('class', 'item');
-                        itemElement.innerText = item.title;
+                tocPath = path.toString().split(',');
 
-                        Polymer.dom(layer).appendChild(itemElement);
-                    });
+                this.id++;
 
-                    return layer;
-                }
+                layerId = this.id;
 
-                addLayer(tocPath, parentTitle) {
-                    this._id++;
+                items = this.getItems(tocPath, this.toc);
+                items = this.prepForTemplate(items, tocPath);
 
-                    var layerId = 'layer-' + this._id;
+                layer.title = title;
+                layer.id = layerId;
+                layer.zIndex = Number(this.id) + 100;
+                layer.items = items;
+                layer.path = path;
 
-                    var layer = document.createElement('DIV');
-                    layer.setAttribute('id', layerId);
-                    layer.setAttribute('data-toc-path', tocPath);
-                    layer.style.zIndex = (this._id + 100);
-                    layer.classList.add('layer');
+                this.push('layers', layer);
 
-                    var closeButton = document.createElement('DIV');
-                    closeButton.classList.add('pointer');
-                    closeButton.setAttribute('data-role', 'close-layer');
-                    closeButton.setAttribute('title', parentTitle);
-                    closeButton.innerHTML = '<span class="left-arrow"></span>' + parentTitle;
+                thisRoot = this.root;
 
-                    Polymer.dom(layer).appendChild(closeButton);
+                setTimeout(function() {
+                    Polymer.dom(thisRoot).querySelector('#layer-' + layerId).classList.add('show');
+                }, 0);
+            }
 
-                    layer = this.bindLayer(layer, tocPath);
+            hideLayer(e) {
+                var   parentSelector
+                    , parent
+                    , parentTocPath
+                ;
+                
+                parentSelector = '#' + e.target.parentElement.getAttribute('id');
+                parent = Polymer.dom(this.root).querySelector(parentSelector);
+                parent.classList.remove('show');
 
-                    Polymer.dom(this._navContainer).appendChild(layer);
+                parentTocPath = parent.getAttribute('data-toc-path');
+                this.removeLastLayer(parentTocPath);
+            }
 
-                    var root = this.shadowRoot;
+            removeLastLayer(parentTocPath) {
+                var thisRoot = this.root;
 
-                    setTimeout(function() {
-                        root.querySelector('#' + layerId).classList.add('show');
-                    }, 0);
-                }
+                setTimeout(function() {
+                    var root, layer;
 
-                hideLayer(e) {
-                    var parentSelector = '#' + e.target.parentElement.getAttribute('id');
-                    var parent = this.shadowRoot.querySelector(parentSelector);
-                    parent.classList.remove('show');
-
-                    var parentTocPath = parent.getAttribute('data-toc-path');
-                    this.removeLastLayer(parentTocPath);
-                }
-
-                removeLastLayer(parentTocPath) {
-                    var container = this._navContainer;
-                    setTimeout(function() {
-                        var layerToRemove = container.querySelector('.layer[data-toc-path^="' + parentTocPath + '"]');
-                        Polymer.dom(container).removeChild(layerToRemove);
-                    }, 1000); // allow enough time for close animation to complete
-                }
-
-                parentClick(e){
-                    var target = e.target;
-
-                    var selectedItems = target.parentElement.querySelector('.item-selected');
-                    if(selectedItems) {
-                        selectedItems.classList.remove('item-selected');
-                    }
-
-                    target.classList.add('item-selected');
-
-                    var title = target.innerText; 
-                    this.addLayer(target.getAttribute('data-toc-path'), title);
-                }
-
-                itemClick(e){
-                    var target = e.target;
-
-                    var selected = target.parentElement.querySelectorAll('.item-selected');
+                    root = Polymer.dom(thisRoot).querySelector('[data-role="root"]');
+                    layer = Polymer.dom(root).querySelector('.layer[data-toc-path^="' + parentTocPath + '"]');
                     
-                    if(selected && selected.length > 0) {
-                        [].forEach.call(selected, function(item) {
-                            item.classList.remove('item-selected');
-                        });
+                    Polymer.dom(root).removeChild(layer);
+                }, 1000); // allow enough time for close animation to complete
+            }
+
+            parentClick(e) {
+                var   target = e.target
+                    , selectedItems
+                    , title
+                    , path
+                ;
+
+                selectedItems = Polymer.dom(target.parentElement).querySelector('.item-selected');
+                if(selectedItems) {
+                    selectedItems.classList.remove('item-selected');
+                }
+
+                target.classList.add('item-selected');
+
+                title = target.innerText; 
+                path = target.getAttribute('data-toc-path');
+
+                this.addLayer(path, title);
+            }
+
+            itemClick(e){
+                var   target = e.target
+                    , selected
+                    , args
+                    , event
+                ;
+
+                selected = Polymer.dom(target.parentElement).querySelectorAll('.item-selected');
+                
+                selected.forEach.call(selected, function(item) {
+                    item.classList.remove('item-selected');
+                });
+
+                target.classList.add('item-selected');
+
+                args = {
+                    tocPath: target.getAttribute('data-toc-path'),
+                    fileName: target.getAttribute('data-name'),
+                    title: target.innerText
+                };
+
+                event = new CustomEvent('itemselected', { 
+                    detail: {
+                        ui: e, 
+                        data: args
                     }
+                });
 
-                    target.classList.add('item-selected');
+                this.dispatchEvent(event);
+            }
 
-                    var args = {
-                        tocPath: target.getAttribute('data-toc-path'),
-                        fileName: target.getAttribute('data-name'),
-                        title: target.innerText
-                    };
+            click(e) {
+                var   currentTarget = e.target
+                    , isParent = /true/i.test(currentTarget.getAttribute('data-parent'))
+                ;
 
-                    var event = new CustomEvent('itemselected', { 
-                        detail: {
-                            ui: e, 
-                            data: args
-                        }
-                    });
-
-                    this.dispatchEvent(event);
+                if(currentTarget.getAttribute('data-role') === 'close-layer') {
+                    this.hideLayer(e);
+                } else if(isParent) {
+                    this.parentClick(e);
+                } else {
+                    this.itemClick(e);
                 }
+            }
 
-                click(e) {
-                    var currentTarget = e.target;
+            prepForTemplate(items, path) {
 
-                    if(currentTarget.getAttribute('data-role') === 'close-layer') {
-                        this.hideLayer(e);
-                    } else if(currentTarget.getAttribute('data-parent') === 'false') {
-                        this.itemClick(e);
-                    } else if(currentTarget.getAttribute('data-parent') === 'true') {
-                        this.parentClick(e);
-                    }
-                }
+                items.forEach(function(item, index){
+                    var   newPath = path.concat([String(index)]).join(',')
+                        , isParent = (item.children && item.children.length > 0)
+                    ;
 
-                init(toc) {
-                    this._navContainer =  this.shadowRoot.querySelector('div[data-role="container"]');
-                    this._toc = toc;
-                    this._id = 0;
+                    item.isParent = String(isParent);
+                    item.path = newPath;
+                });
 
-                    this.bindLayer(this._navContainer.querySelector('div[data-role="root"]'));
-                }
+                return items;
+            }
+
+            init(toc) {
+                this.toc = toc;
+                this.rootItems = this.prepForTemplate(toc, []);
+                this.id = 0;
+                this.layers = [];
+            }
+
         }
 
-        window.customElements.define(SliderNav.is, SliderNav);
+        window.customElements.define(SliderNav.is, SliderNav);        
 
     }(window, document));
 </script>
