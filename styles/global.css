@@ -16,8 +16,8 @@ body {
 .card {
     border: #ccc solid 1px;
     background-color: #fff;
-    padding: 20px;
-    min-height: 200px;
+    padding: 25px;
+    min-height: 225px;
 }
 
 .card:hover {
@@ -28,6 +28,7 @@ body {
     margin-top: 20px;
     padding-top: 10px;
     border-top: solid 1px #ccc;
+    color: #999;
 }
 
 .chevron {
