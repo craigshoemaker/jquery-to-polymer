@@ -17,7 +17,8 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#2.0.0-rc.3",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "font-awesome": "fontawesome#^4.7.0"
   },
   "resolutions": {
     "webcomponentsjs": "^v1.0.0-rc.5"

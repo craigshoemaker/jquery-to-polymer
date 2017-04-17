@@ -1,3 +1,9 @@
+h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 22px;
+}
+
 .pointer {
     cursor: pointer;
 }
@@ -8,7 +14,7 @@
     top: 0;
     left: 0;
     height: 100%;
-    width: 300px;
+    width: 320px;
     font-size: 1em;
     transition: .35s;
     overflow: auto;
