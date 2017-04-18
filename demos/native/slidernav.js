@@ -10,11 +10,11 @@
         individualItemCallback: function() {},
 
         getItems: function(path, parent) {
+            var isRoot, level;
             
             // clone path
             path = JSON.parse(JSON.stringify(path));
 
-            var isRoot, level;
             path.forEach(function(pathIndex, loopIndex) {
                 isRoot = (loopIndex === 0);
 
@@ -29,7 +29,7 @@
         },
 
         bindLayer: function(layer, tocPath) {
-            var items, path;
+            var items, path, newPath, isParent, itemElement;
 
             if(!tocPath) {
                 items = module.toc;
@@ -40,14 +40,14 @@
             }
 
             items.forEach(function(item, index) {
-                var newPath = path.concat([index]);
-                var isParent = false;
+                newPath = path.concat([index]);
+                isParent = false;
 
                 if(item.children) {
                     isParent = item.children.length > 0;
                 }
 
-                var itemElement = document.createElement('DIV');
+                itemElement = document.createElement('DIV');
                 itemElement.setAttribute('data-parent', isParent.toString());
                 itemElement.setAttribute('data-toc-path', newPath.join(','));
                 itemElement.setAttribute('data-name', item.fileName);
@@ -62,17 +62,19 @@
         },
 
         addLayer: function(tocPath, parentTitle) {
+            var layerId, layer, closeButton;
+
             module.id++;
 
-            var layerId = 'layer-' + module.id;
+            layerId = 'layer-' + module.id;
 
-            var layer = document.createElement('DIV');
+            layer = document.createElement('DIV');
             layer.setAttribute('id', layerId);
             layer.setAttribute('data-toc-path', tocPath);
             layer.style.zIndex = (module.id + 100);
             layer.classList.add('slidernav-layer');
 
-            var closeButton = document.createElement('DIV');
+            closeButton = document.createElement('DIV');
             closeButton.classList.add('pointer');
             closeButton.setAttribute('data-role', 'close-layer');
             closeButton.setAttribute('title', parentTitle);
@@ -90,11 +92,13 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector = '#' + e.target.parentElement.getAttribute('id');
-            var parent = document.querySelector(parentSelector);
+            var parentSelector, parent, parentTocPath;
+
+            parentSelector = '#' + e.target.parentElement.getAttribute('id');
+            parent = document.querySelector(parentSelector);
             parent.classList.remove('slidernav-show');
 
-            var parentTocPath = parent.getAttribute('data-toc-path');
+            parentTocPath = parent.getAttribute('data-toc-path');
             module.removeLastLayer(parentTocPath);
         },
 
@@ -105,23 +109,27 @@
         },
 
         parentClick: function(e){
-            var target = e.target;
+            var target, selectedItems, title;
 
-            var selectedItems = target.parentElement.querySelector('.slidernav-item-selected');
+            target = e.target;
+
+            selectedItems = target.parentElement.querySelector('.slidernav-item-selected');
             if(selectedItems) {
                 selectedItems.classList.remove('slidernav-item-selected');
             }
 
             target.classList.add('slidernav-item-selected');
 
-            var title = target.innerText; 
+            title = target.innerText; 
             module.addLayer(target.getAttribute('data-toc-path'), title);
         },
 
         itemClick: function(e){
-            var target = e.target;
+            var target, selected, args;
 
-            var selected = target.parentElement.querySelectorAll('.slidernav-item-selected');
+            target = e.target;
+
+            selected = target.parentElement.querySelectorAll('.slidernav-item-selected');
             
             if(selected && selected.length > 0) {
                 [].forEach.call(selected, function(item) {
@@ -131,7 +139,7 @@
 
             target.classList.add('slidernav-item-selected');
 
-            var args = {
+            args = {
                 tocPath: target.getAttribute('data-toc-path'),
                 fileName: target.getAttribute('data-name'),
                 title: target.innerText

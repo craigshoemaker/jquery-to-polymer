@@ -129,12 +129,7 @@
             }
 
             addLayer(path, title) {
-                var   layer = {}
-                    , items
-                    , layerId
-                    , thisRoot
-                    , tocPath
-                ;
+                var layer = {}, items, layerId, thisRoot, tocPath;
 
                 tocPath = path.toString().split(',');
 
@@ -161,10 +156,7 @@
             }
 
             hideLayer(e) {
-                var   parentSelector
-                    , parent
-                    , parentTocPath
-                ;
+                var parentSelector, parent, parentTocPath;
                 
                 parentSelector = '#' + e.target.parentElement.getAttribute('id');
                 parent = Polymer.dom(this.root).querySelector(parentSelector);
@@ -188,11 +180,7 @@
             }
 
             parentClick(e) {
-                var   target = e.target
-                    , selectedItems
-                    , title
-                    , path
-                ;
+                var target = e.target, selectedItems, title, path;
 
                 selectedItems = Polymer.dom(target.parentElement).querySelector('.item-selected');
                 if(selectedItems) {
@@ -208,11 +196,7 @@
             }
 
             itemClick(e){
-                var   target = e.target
-                    , selected
-                    , args
-                    , event
-                ;
+                var target = e.target, selected, args, event;
 
                 selected = Polymer.dom(target.parentElement).querySelectorAll('.item-selected');
                 
@@ -239,9 +223,10 @@
             }
 
             click(e) {
-                var   currentTarget = e.target
-                    , isParent = /true/i.test(currentTarget.getAttribute('data-parent'))
-                ;
+                var currentTarget, isParent;
+
+                currentTarget = e.target;
+                isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
 
                 if(currentTarget.getAttribute('data-role') === 'close-layer') {
                     this.hideLayer(e);
@@ -255,9 +240,10 @@
             prepForTemplate(items, path) {
 
                 items.forEach(function(item, index){
-                    var   newPath = path.concat([String(index)]).join(',')
-                        , isParent = (item.children && item.children.length > 0)
-                    ;
+                    var newPath, isParent;
+
+                    newPath = path.concat([String(index)]).join(',');
+                    isParent = (item.children && item.children.length > 0);
 
                     item.isParent = String(isParent);
                     item.path = newPath;
@@ -272,7 +258,6 @@
                 this.id = 0;
                 this.layers = [];
             }
-
         }
 
         window.customElements.define(SliderNav.is, SliderNav);        

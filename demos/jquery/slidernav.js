@@ -10,11 +10,11 @@
         individualItemCallback: function() {},
 
         getItems: function(path, parent) {
+            var isRoot, level;
             
             // clone path
             path = JSON.parse(JSON.stringify(path));
 
-            var isRoot, level;
             path.forEach(function(pathIndex, loopIndex) {
                 isRoot = (loopIndex === 0);
 
@@ -29,7 +29,7 @@
         },
 
         bindLayer: function($layer, tocPath) {
-            var items, path;
+            var items, path, newPath, isParent, itemElement;
 
             if(!tocPath) {
                 items = module.toc;
@@ -40,14 +40,14 @@
             }
 
             items.forEach(function(item, index) {
-                var newPath = path.concat([index]);
-                var isParent = false;
+                newPath = path.concat([index]);
+                isParent = false;
 
                 if(item.children) {
                     isParent = item.children.length > 0;
                 }
 
-                var itemElement = $('<div>');
+                itemElement = $('<div>');
                 itemElement.attr('data-parent', isParent.toString());
                 itemElement.attr('data-toc-path', newPath.join(','));
                 itemElement.attr('data-name', item.fileName);
@@ -62,17 +62,19 @@
         },
 
         addLayer: function(tocPath, parentTitle) {
+            var layerId, $layer, $closeButton;
+
             module.id++;
 
-            var layerId = 'layer-' + module.id;
+            layerId = 'layer-' + module.id;
 
-            var $layer = $('<div>');
+            $layer = $('<div>');
             $layer.attr('id', layerId);
             $layer.attr('data-toc-path', tocPath);
             $layer.css('z-index', (module.id + 100));
             $layer.addClass('slidernav-layer');
 
-            var $closeButton = $('<div>');
+            $closeButton = $('<div>');
             $closeButton.addClass('pointer');
             $closeButton.attr('data-role', 'close-layer');
             $closeButton.attr('title', parentTitle);
@@ -90,11 +92,13 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector = '#' + $(e.currentTarget).parent().attr('id');
-            var $parent = $(parentSelector);
+            var parentSelector, $parent, parentTocPath;
+
+            parentSelector = '#' + $(e.currentTarget).parent().attr('id');
+            $parent = $(parentSelector);
             $parent.removeClass('slidernav-show');
 
-            var parentTocPath = $parent.data('toc-path');
+            parentTocPath = $parent.data('toc-path');
             module.removeLastLayer(parentTocPath);
         },
 
@@ -105,19 +109,24 @@
         },
 
         parentClick: function(e){
-            var $target = $(e.currentTarget);
+            var $target, title;
+
+            $target = $(e.currentTarget);
             $target.parent().find('.slidernav-item-selected').removeClass('slidernav-item-selected');
             $target.addClass('slidernav-item-selected');
-            var title = $target.text(); 
+            
+            title = $target.text(); 
             module.addLayer($target.data('toc-path'), title);
         },
 
         itemClick: function(e){
-            var $target = $(e.currentTarget);
+            var $target, args;
+
+            $target = $(e.currentTarget);
             $target.parent().find('.slidernav-item-selected').removeClass('slidernav-item-selected');
             $target.addClass('slidernav-item-selected');
 
-            var args = {
+            args = {
                 tocPath: $target.data('toc-path'),
                 fileName: $target.data('name'),
                 title: $target.text()

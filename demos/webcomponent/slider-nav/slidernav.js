@@ -10,11 +10,11 @@
         toc: {},
 
         getItems: function(path, parent) {
+            var isRoot, level;
             
             // clone path
             path = JSON.parse(JSON.stringify(path));
 
-            var isRoot, level;
             path.forEach(function(pathIndex, loopIndex) {
                 isRoot = (loopIndex === 0);
 
@@ -44,14 +44,16 @@
             }
 
             items.forEach(function(item, index) {
-                var newPath = path.concat([String(index)]);
-                var isParent = false;
+                var newPath, isParent, itemElement;
+
+                newPath = path.concat([String(index)]);
+                isParent = false;
 
                 if(item.children) {
                     isParent = item.children.length > 0;
                 }
 
-                var itemElement = document.createElement('DIV');
+                itemElement = document.createElement('DIV');
                 itemElement.setAttribute('data-parent', isParent.toString());
                 itemElement.setAttribute('data-toc-path', newPath.join(','));
                 itemElement.setAttribute('data-name', item.fileName);
@@ -66,17 +68,19 @@
         },
 
         addLayer: function(tocPath, parentTitle) {
+            var layerId, layer, closeButton;
+
             module.id++;
 
-            var layerId = 'layer-' + module.id;
+            layerId = 'layer-' + module.id;
 
-            var layer = document.createElement('DIV');
+            layer = document.createElement('DIV');
             layer.setAttribute('id', layerId);
             layer.setAttribute('data-toc-path', tocPath);
             layer.style.zIndex = (module.id + 100);
             layer.classList.add('layer');
 
-            var closeButton = document.createElement('DIV');
+            closeButton = document.createElement('DIV');
             closeButton.classList.add('pointer');
             closeButton.setAttribute('data-role', 'close-layer');
             closeButton.setAttribute('title', parentTitle);
@@ -94,11 +98,13 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector = '#' + e.target.parentElement.getAttribute('id');
-            var parent = module.component.querySelector(parentSelector);
+            var parentSelector, parent, parentTocPath;
+
+            parentSelector = '#' + e.target.parentElement.getAttribute('id');
+            parent = module.component.querySelector(parentSelector);
             parent.classList.remove('show');
 
-            var parentTocPath = parent.getAttribute('data-toc-path');
+            parentTocPath = parent.getAttribute('data-toc-path');
             module.removeLastLayer(parentTocPath);
         },
 
@@ -109,23 +115,27 @@
         },
 
         parentClick: function(e){
-            var target = e.target;
+            var target, selectedItems, title;
 
-            var selectedItems = target.parentElement.querySelector('.item-selected');
+            target = e.target;
+
+            selectedItems = target.parentElement.querySelector('.item-selected');
             if(selectedItems) {
                 selectedItems.classList.remove('item-selected');
             }
 
             target.classList.add('item-selected');
 
-            var title = target.innerText; 
+            title = target.innerText; 
             module.addLayer(target.getAttribute('data-toc-path'), title);
         },
 
         itemClick: function(e){
-            var target = e.target;
+            var target, selected, args, event;
 
-            var selected = target.parentElement.querySelectorAll('.item-selected');
+            target = e.target;
+
+            selected = target.parentElement.querySelectorAll('.item-selected');
             
             if(selected && selected.length > 0) {
                 [].forEach.call(selected, function(item) {
@@ -135,13 +145,13 @@
 
             target.classList.add('item-selected');
 
-            var args = {
+            args = {
                 tocPath: target.getAttribute('data-toc-path'),
                 fileName: target.getAttribute('data-name'),
                 title: target.innerText
             };
 
-            var event = new CustomEvent('itemselected', { 
+            event = new CustomEvent('itemselected', { 
                 detail: {
                     ui: e, 
                     data: args
@@ -176,10 +186,10 @@
         },
 
         bootstrap: function() {
-            var component, template, root;
+            var component, template, root, proto, script;
 
-            var proto = Object.create(HTMLElement.prototype);
-            var script = document.currentScript.ownerDocument;
+            proto = Object.create(HTMLElement.prototype);
+            script = document.currentScript.ownerDocument;
 
             proto.createdCallback = function() {
                 template = script.querySelector('template');
