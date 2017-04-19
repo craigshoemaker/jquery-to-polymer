@@ -67,13 +67,13 @@
                 <template is="dom-repeat" items="{{rootItems}}">
                     <div class="item"
                          data-parent$="{{item.isParent}}"
-                         data-toc-path$="{{item.path}}"
+                         data-nav-path$="{{item.path}}"
                          data-name$="{{item.fileName}}"
                          title="{{item.title}}">{{item.title}}</div>
                 </template>
 
                 <template id="layer-template" is="dom-repeat" items="{{layers}}" as="layer">
-                    <div id="layer-{{layer.id}}" data-toc-path$="{{layer.path}}" class="layer" style="z-index: {{layer.zIndex}};">
+                    <div id="layer-{{layer.id}}" data-nav-path$="{{layer.path}}" class="layer" style="z-index: {{layer.zIndex}};">
                         <div class="pointer" data-role="close-layer" title="{{layer.title}}">
                             <span class="left-arrow"></span> {{layer.title}}
                         </div>
@@ -81,7 +81,7 @@
                         <template is="dom-repeat" as="layerItem" items={{layer.items}}>
                             <div class="item"
                                  data-parent$="{{layerItem.isParent}}"
-                                 data-toc-path$="{{layerItem.path}}"
+                                 data-nav-path$="{{layerItem.path}}"
                                  data-name$="{{layerItem.fileName}}"
                                  title="{{layerItem.title}}">{{layerItem.title}}</div>
                         </template>
@@ -129,16 +129,16 @@
             }
 
             addLayer(path, title) {
-                var layer = {}, items, layerId, thisRoot, tocPath;
+                var layer = {}, items, layerId, thisRoot, navPath;
 
-                tocPath = path.toString().split(',');
+                navPath = path.toString().split(',');
 
                 this.id++;
 
                 layerId = this.id;
 
-                items = this.getItems(tocPath, this.toc);
-                items = this.prepForTemplate(items, tocPath);
+                items = this.getItems(navPath, this.navData);
+                items = this.prepForTemplate(items, navPath);
 
                 layer.title = title;
                 layer.id = layerId;
@@ -156,24 +156,24 @@
             }
 
             hideLayer(e) {
-                var parentSelector, parent, parentTocPath;
+                var parentSelector, parent, parentnavPath;
                 
                 parentSelector = '#' + e.target.parentElement.getAttribute('id');
                 parent = Polymer.dom(this.root).querySelector(parentSelector);
                 parent.classList.remove('show');
 
-                parentTocPath = parent.getAttribute('data-toc-path');
-                this.removeLastLayer(parentTocPath);
+                parentnavPath = parent.getAttribute('data-nav-path');
+                this.removeLastLayer(parentnavPath);
             }
 
-            removeLastLayer(parentTocPath) {
+            removeLastLayer(parentnavPath) {
                 var thisRoot = this.root;
 
                 setTimeout(function() {
                     var root, layer;
 
                     root = Polymer.dom(thisRoot).querySelector('[data-role="root"]');
-                    layer = Polymer.dom(root).querySelector('.layer[data-toc-path^="' + parentTocPath + '"]');
+                    layer = Polymer.dom(root).querySelector('.layer[data-nav-path^="' + parentnavPath + '"]');
                     
                     Polymer.dom(root).removeChild(layer);
                 }, 1000); // allow enough time for close animation to complete
@@ -190,7 +190,7 @@
                 target.classList.add('item-selected');
 
                 title = target.innerText; 
-                path = target.getAttribute('data-toc-path');
+                path = target.getAttribute('data-nav-path');
 
                 this.addLayer(path, title);
             }
@@ -207,7 +207,7 @@
                 target.classList.add('item-selected');
 
                 args = {
-                    tocPath: target.getAttribute('data-toc-path'),
+                    navPath: target.getAttribute('data-nav-path'),
                     fileName: target.getAttribute('data-name'),
                     title: target.innerText
                 };
@@ -252,9 +252,9 @@
                 return items;
             }
 
-            init(toc) {
-                this.toc = toc;
-                this.rootItems = this.prepForTemplate(toc, []);
+            init(navData) {
+                this.navData = navData;
+                this.rootItems = this.prepForTemplate(navData, []);
                 this.id = 0;
                 this.layers = [];
             }

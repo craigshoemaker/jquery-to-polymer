@@ -7,7 +7,7 @@
         component: null,
         navContainer: null,
         id: 0,
-        toc: {},
+        navData: {},
 
         getItems: function(path, parent) {
             var isRoot, level;
@@ -28,19 +28,19 @@
             return level.children;
         },
 
-        bindLayer: function(layer, tocPath) {
+        bindLayer: function(layer, navPath) {
             var items, path;
 
-            if(!module.toc) {
+            if(!module.navData) {
                 return;
             }
 
-            if(!tocPath) {
-                items = module.toc;
+            if(!navPath) {
+                items = module.navData;
                 path = [];
             } else {
-                path = tocPath.toString().split(',');
-                items = module.getItems(path, module.toc);
+                path = navPath.toString().split(',');
+                items = module.getItems(path, module.navData);
             }
 
             items.forEach(function(item, index) {
@@ -55,7 +55,7 @@
 
                 itemElement = document.createElement('DIV');
                 itemElement.setAttribute('data-parent', isParent.toString());
-                itemElement.setAttribute('data-toc-path', newPath.join(','));
+                itemElement.setAttribute('data-nav-path', newPath.join(','));
                 itemElement.setAttribute('data-name', item.fileName);
                 itemElement.setAttribute('title', item.title);
                 itemElement.setAttribute('class', 'item');
@@ -67,7 +67,7 @@
             return layer;
         },
 
-        addLayer: function(tocPath, parentTitle) {
+        addLayer: function(navPath, parentTitle) {
             var layerId, layer, closeButton;
 
             module.id++;
@@ -76,7 +76,7 @@
 
             layer = document.createElement('DIV');
             layer.setAttribute('id', layerId);
-            layer.setAttribute('data-toc-path', tocPath);
+            layer.setAttribute('data-nav-path', navPath);
             layer.style.zIndex = (module.id + 100);
             layer.classList.add('layer');
 
@@ -88,7 +88,7 @@
 
             layer.append(closeButton);
 
-            layer = module.bindLayer(layer, tocPath);
+            layer = module.bindLayer(layer, navPath);
 
             module.navContainer.append(layer);
 
@@ -98,19 +98,19 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector, parent, parentTocPath;
+            var parentSelector, parent, parentnavPath;
 
             parentSelector = '#' + e.target.parentElement.getAttribute('id');
             parent = module.component.querySelector(parentSelector);
             parent.classList.remove('show');
 
-            parentTocPath = parent.getAttribute('data-toc-path');
-            module.removeLastLayer(parentTocPath);
+            parentnavPath = parent.getAttribute('data-nav-path');
+            module.removeLastLayer(parentnavPath);
         },
 
-        removeLastLayer: function(parentTocPath) {
+        removeLastLayer: function(parentnavPath) {
             setTimeout(function() {
-                module.navContainer.querySelector('.layer[data-toc-path^="' + parentTocPath + '"]').remove();    
+                module.navContainer.querySelector('.layer[data-nav-path^="' + parentnavPath + '"]').remove();    
             }, 1000); // allow enough time for close animation to complete
         },
 
@@ -127,7 +127,7 @@
             target.classList.add('item-selected');
 
             title = target.innerText; 
-            module.addLayer(target.getAttribute('data-toc-path'), title);
+            module.addLayer(target.getAttribute('data-nav-path'), title);
         },
 
         itemClick: function(e){
@@ -146,7 +146,7 @@
             target.classList.add('item-selected');
 
             args = {
-                tocPath: target.getAttribute('data-toc-path'),
+                navPath: target.getAttribute('data-nav-path'),
                 fileName: target.getAttribute('data-name'),
                 title: target.innerText
             };
@@ -161,12 +161,12 @@
             module.navContainer.dispatchEvent(event);
         },
 
-        init: function(toc, component) {
+        init: function(navData, component) {
 
             module.component = component;
 
             module.navContainer = module.component.querySelector('div[data-role="container"]');
-            module.toc = toc;
+            module.navData = navData;
 
             module.bindLayer(module.navContainer.querySelector('div[data-role="root"]'));
 

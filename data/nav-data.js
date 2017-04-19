@@ -1,4 +1,4 @@
-window.toc = [
+window.navData = [
 	{ "title":"Introduction", "fileName": "introduction", "children":[] },
 	{ "title":"Step 1", "fileName": "step-one", "children":[] },
 	{ "title":"Step 2", "fileName": "step-2", "children":[

@@ -13,12 +13,12 @@
             </div>
         </div>
         <div class="implementation">jQuery</div>
-        <script src="../../data/toc.js" type="text/javascript"></script>
+        <script src="../../data/nav-data.js" type="text/javascript"></script>
         <script src="../../bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
         <script src="slidernav.js" type="text/javascript"></script>
         <script>
             $(function() {
-                sliderNav.init(window.toc, function(e, args) {
+                sliderNav.init(window.navData, function(e, args) {
                     console.log(e, args);
                 });
             });

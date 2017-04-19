@@ -6,7 +6,7 @@
 
         $navContainer: null,
         id: 0,
-        toc: {},
+        navData: {},
         individualItemCallback: function() {},
 
         getItems: function(path, parent) {
@@ -28,15 +28,15 @@
             return level.children;
         },
 
-        bindLayer: function($layer, tocPath) {
+        bindLayer: function($layer, navPath) {
             var items, path, newPath, isParent, itemElement;
 
-            if(!tocPath) {
-                items = module.toc;
+            if(!navPath) {
+                items = module.navData;
                 path = [];
             } else {
-                path = tocPath.toString().split(',');
-                items = module.getItems(path, module.toc);
+                path = navPath.toString().split(',');
+                items = module.getItems(path, module.navData);
             }
 
             items.forEach(function(item, index) {
@@ -49,7 +49,7 @@
 
                 itemElement = $('<div>');
                 itemElement.attr('data-parent', isParent.toString());
-                itemElement.attr('data-toc-path', newPath.join(','));
+                itemElement.attr('data-nav-path', newPath.join(','));
                 itemElement.attr('data-name', item.fileName);
                 itemElement.attr('title', item.title);
                 itemElement.addClass('slidernav-item');
@@ -61,7 +61,7 @@
             return $layer;
         },
 
-        addLayer: function(tocPath, parentTitle) {
+        addLayer: function(navPath, parentTitle) {
             var layerId, $layer, $closeButton;
 
             module.id++;
@@ -70,7 +70,7 @@
 
             $layer = $('<div>');
             $layer.attr('id', layerId);
-            $layer.attr('data-toc-path', tocPath);
+            $layer.attr('data-nav-path', navPath);
             $layer.css('z-index', (module.id + 100));
             $layer.addClass('slidernav-layer');
 
@@ -82,7 +82,7 @@
 
             $layer.append($closeButton);
 
-            $layer = module.bindLayer($layer, tocPath);
+            $layer = module.bindLayer($layer, navPath);
 
             module.$navContainer.append($layer);
 
@@ -92,19 +92,19 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector, $parent, parentTocPath;
+            var parentSelector, $parent, parentnavPath;
 
             parentSelector = '#' + $(e.currentTarget).parent().attr('id');
             $parent = $(parentSelector);
             $parent.removeClass('slidernav-show');
 
-            parentTocPath = $parent.data('toc-path');
-            module.removeLastLayer(parentTocPath);
+            parentnavPath = $parent.data('nav-path');
+            module.removeLastLayer(parentnavPath);
         },
 
-        removeLastLayer: function(parentTocPath) {
+        removeLastLayer: function(parentnavPath) {
             setTimeout(function() {
-                module.$navContainer.find('.slidernav-layer[data-toc-path^="' + parentTocPath + '"]').remove();
+                module.$navContainer.find('.slidernav-layer[data-nav-path^="' + parentnavPath + '"]').remove();
             }, 1000); // allow enough time for close animation to complete
         },
 
@@ -116,7 +116,7 @@
             $target.addClass('slidernav-item-selected');
             
             title = $target.text(); 
-            module.addLayer($target.data('toc-path'), title);
+            module.addLayer($target.data('nav-path'), title);
         },
 
         itemClick: function(e){
@@ -127,7 +127,7 @@
             $target.addClass('slidernav-item-selected');
 
             args = {
-                tocPath: $target.data('toc-path'),
+                navPath: $target.data('nav-path'),
                 fileName: $target.data('name'),
                 title: $target.text()
             };
@@ -135,9 +135,9 @@
             module.individualItemCallback(e, args);
         },
 
-        init: function(toc, callback) {
+        init: function(navData, callback) {
             module.$navContainer = $('div[data-role="slidernav-container"]');
-            module.toc = toc;
+            module.navData = navData;
             module.individualItemCallback = callback;
 
             module.bindLayer(module.$navContainer.find('div[data-role="slidernav-root"]'));

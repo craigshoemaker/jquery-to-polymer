@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="../../styles/global.css" />
         <script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
         <link rel="import" href="../../bower_components/polymer/polymer.html">
-        <script src="../../data/toc.js" type="text/javascript"></script>
+        <script src="../../data/nav-data.js" type="text/javascript"></script>
 
         <link rel="import" href="slider-nav/slider-nav.html">
     </head>
@@ -19,7 +19,7 @@
 
                 var slider = document.getElementById('slider');
 
-                slider.init(window.toc);
+                slider.init(window.navData);
 
                 slider.addEventListener('itemselected', function(e){
                     console.log(e.detail.ui, e.detail.data);
