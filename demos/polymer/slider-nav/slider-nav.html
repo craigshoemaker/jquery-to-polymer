@@ -223,17 +223,22 @@
             }
 
             click(e) {
-                var currentTarget, isParent;
+                var currentTarget, isItem, isParent, isCloseLayer;
 
                 currentTarget = e.target;
-                isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
+                isItem = currentTarget.classList.contains('item');
+                isCloseLayer = currentTarget.getAttribute('data-role') === 'close-layer';
 
-                if(currentTarget.getAttribute('data-role') === 'close-layer') {
-                    this.hideLayer(e);
-                } else if(isParent) {
-                    this.parentClick(e);
-                } else {
-                    this.itemClick(e);
+                if(isItem || isCloseLayer){
+                    isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
+
+                    if(isCloseLayer) {
+                        this.hideLayer(e);
+                    } else if(isParent) {
+                        this.parentClick(e);
+                    } else {
+                        this.itemClick(e);
+                    }
                 }
             }
 

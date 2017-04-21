@@ -31,7 +31,7 @@
         bindLayer: function($layer, navPath) {
             var items, path, newPath, isParent, itemElement;
 
-            if(!navPath) {
+            if(typeof navPath === 'undefined') {
                 items = module.navData;
                 path = [];
             } else {

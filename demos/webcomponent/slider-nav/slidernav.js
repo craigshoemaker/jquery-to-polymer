@@ -35,7 +35,7 @@
                 return;
             }
 
-            if(!navPath) {
+            if(typeof navPath === 'undefined') {
                 items = module.navData;
                 path = [];
             } else {
@@ -172,16 +172,23 @@
 
             module.navContainer.addEventListener('click', function(e){
 
-                var currentTarget = e.target;
+                var currentTarget, isItem, isParent, isCloseLayer;
 
-                if(currentTarget.getAttribute('data-role') === 'close-layer') {
-                    module.hideLayer(e);
-                } else if(currentTarget.getAttribute('data-parent') === 'false') {
-                    module.itemClick(e);
-                } else if(currentTarget.getAttribute('data-parent') === 'true') {
-                    module.parentClick(e);
+                currentTarget = e.target;
+                isItem = currentTarget.classList.contains('item');
+                isCloseLayer = currentTarget.getAttribute('data-role') === 'close-layer';
+
+                if(isItem || isCloseLayer){
+                    isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
+
+                    if(isCloseLayer) {
+                        module.hideLayer(e);
+                    } else if(isParent) {
+                        module.parentClick(e);
+                    } else {
+                        module.itemClick(e);
+                    }
                 }
-
             });
         },
 
