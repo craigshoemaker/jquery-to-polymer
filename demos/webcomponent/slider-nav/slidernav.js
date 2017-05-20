@@ -46,12 +46,10 @@
             items.forEach(function(item, index) {
                 var newPath, isParent, itemElement;
 
-                newPath = path.concat([String(index)]);
+                newPath = path.concat([index.toString()]);
                 isParent = false;
 
-                if(item.children) {
-                    isParent = item.children.length > 0;
-                }
+                isParent = item.children && item.children.length > 0;
 
                 itemElement = document.createElement('DIV');
                 itemElement.setAttribute('data-parent', isParent.toString());

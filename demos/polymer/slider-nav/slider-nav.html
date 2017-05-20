@@ -142,7 +142,7 @@
 
                 layer.title = title;
                 layer.id = layerId;
-                layer.zIndex = Number(this.id) + 100;
+                layer.zIndex = this.id + 100;
                 layer.items = items;
                 layer.path = path;
 
@@ -247,10 +247,10 @@
                 items.forEach(function(item, index){
                     var newPath, isParent;
 
-                    newPath = path.concat([String(index)]).join(',');
+                    newPath = path.concat([index.toString()]).join(',');
                     isParent = (item.children && item.children.length > 0);
 
-                    item.isParent = String(isParent);
+                    item.isParent = isParent.toString();
                     item.path = newPath;
                 });
 

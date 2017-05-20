@@ -18,6 +18,7 @@ body {
     background-color: #fff;
     padding: 25px;
     min-height: 225px;
+    border-radius: 3px;
 }
 
 .card:hover {

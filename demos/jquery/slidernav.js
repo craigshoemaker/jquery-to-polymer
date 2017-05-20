@@ -43,9 +43,7 @@
                 newPath = path.concat([index]);
                 isParent = false;
 
-                if(item.children) {
-                    isParent = item.children.length > 0;
-                }
+                isParent = (item.children && item.children.length > 0);
 
                 itemElement = $('<div>');
                 itemElement.attr('data-parent', isParent.toString());
