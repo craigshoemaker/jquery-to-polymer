@@ -140,7 +140,7 @@
 
             module.bindLayer(module.$navContainer.find('div[data-role="slidernav-root"]'));
 
-            module.$navContainer.on('click', '[data-role="close-layer"]', module.hideLayer);
+            module.$navContainer.on('click', 'div[data-role="close-layer"]', module.hideLayer);
             module.$navContainer.on('click', 'div[data-parent="false"]', module.itemClick);
             module.$navContainer.on('click', 'div[data-parent="true"]', module.parentClick);
         }
