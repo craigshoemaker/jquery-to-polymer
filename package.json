@@ -1,13 +1,12 @@
 {
   "name": "html5-webcomponents-jquery-polymer",
   "version": "1.0.0",
-  "description": "Sample code for Pluralsight course \"HTML5 Web Components: Moving from jQuery to Polymer.js\"",
+  "description": "Sample code for \"HTML5 Web Components: Moving from jQuery to Polymer.js\"",
   "main": "index.html",
   "devDependencies": {
     "http-server": "^0.10.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server -o"
   },
   "keywords": [
