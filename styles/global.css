@@ -58,3 +58,10 @@ footer {
     padding: 25px;
     text-align: center;
 }
+
+/* Used to demo Shadow DOM */
+/*
+div[data-parent="true"] {
+    color: yellow;
+}
+*/
