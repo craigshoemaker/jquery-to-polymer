@@ -7,7 +7,8 @@
     "http-server": "^0.10.0"
   },
   "scripts": {
-    "start": "http-server -o"
+    "start": "http-server -o",
+    "preinstall": "bower install"
   },
   "keywords": [
     "HTML5",
