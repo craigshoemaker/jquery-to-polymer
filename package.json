@@ -4,6 +4,7 @@
   "description": "Sample code for \"HTML5 Web Components: Moving from jQuery to Polymer.js\"",
   "main": "index.html",
   "devDependencies": {
+    "bower": "^1.8.0",
     "http-server": "^0.10.0"
   },
   "scripts": {
