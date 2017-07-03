@@ -10,14 +10,19 @@
         <link rel="stylesheet" href="../../styles/slidernav.css" type="text/css" />
     </head>
     <body>
+
         <div data-role="slidernav-container">
             <div data-role="slidernav-root">
                 <h2>Courses</h2>
             </div>
         </div>
+
         <div class="implementation">Native Selection API</div>
+
         <script src="../../data/courses.js" type="text/javascript"></script>
+        
         <script src="slidernav.js" type="text/javascript"></script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() { 
                 sliderNav.init(window.navData, function(e, args) {
@@ -25,5 +30,6 @@
                 });
             }, false);
         </script>
+        
     </body>
 </html>
