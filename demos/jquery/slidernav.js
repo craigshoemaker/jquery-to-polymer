@@ -1,4 +1,3 @@
-
 (function ($, window) {
 
     'use strict';
