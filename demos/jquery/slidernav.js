@@ -1,4 +1,5 @@
-(function($, window){
+
+(function ($, window) {
 
     'use strict';
 
@@ -9,23 +10,16 @@
         navData: {},
         individualItemCallback: function() {},
 
-        getItems: function(path, parent) {
-            var isRoot, level;
-            
-            // clone path
-            path = JSON.parse(JSON.stringify(path));
+        init: function(navData, callback) {
+            module.$navContainer = $('div[data-role="slidernav-container"]');
+            module.navData = navData;
+            module.individualItemCallback = callback;
 
-            path.forEach(function(pathIndex, loopIndex) {
-                isRoot = (loopIndex === 0);
+            module.bindLayer(module.$navContainer.find('div[data-role="slidernav-root"]'));
 
-                if(isRoot){
-                    level = parent[pathIndex];
-                } else {
-                    level = level.children[pathIndex];
-                }
-            });
-
-            return level.children;
+            module.$navContainer.on('click', 'div[data-role="close-layer"]', module.hideLayer);
+            module.$navContainer.on('click', 'div[data-parent="false"]', module.itemClick);
+            module.$navContainer.on('click', 'div[data-parent="true"]', module.parentClick);
         },
 
         bindLayer: function($layer, navPath) {
@@ -57,6 +51,36 @@
             });
 
             return $layer;
+        },
+
+        getItems: function(path, parent) {
+            var isRoot, level;
+            
+            // clone path
+            path = JSON.parse(JSON.stringify(path));
+
+            path.forEach(function(pathIndex, loopIndex) {
+                isRoot = (loopIndex === 0);
+
+                if(isRoot){
+                    level = parent[pathIndex];
+                } else {
+                    level = level.children[pathIndex];
+                }
+            });
+
+            return level.children;
+        },
+
+        parentClick: function(e){
+            var $target, title;
+
+            $target = $(e.currentTarget);
+            $target.parent().find('.slidernav-item-selected').removeClass('slidernav-item-selected');
+            $target.addClass('slidernav-item-selected');
+            
+            title = $target.text(); 
+            module.addLayer($target.data('nav-path'), title);
         },
 
         addLayer: function(navPath, parentTitle) {
@@ -106,17 +130,6 @@
             }, 1000); // allow enough time for close animation to complete
         },
 
-        parentClick: function(e){
-            var $target, title;
-
-            $target = $(e.currentTarget);
-            $target.parent().find('.slidernav-item-selected').removeClass('slidernav-item-selected');
-            $target.addClass('slidernav-item-selected');
-            
-            title = $target.text(); 
-            module.addLayer($target.data('nav-path'), title);
-        },
-
         itemClick: function(e){
             var $target, args;
 
@@ -131,19 +144,8 @@
             };
 
             module.individualItemCallback(e, args);
-        },
-
-        init: function(navData, callback) {
-            module.$navContainer = $('div[data-role="slidernav-container"]');
-            module.navData = navData;
-            module.individualItemCallback = callback;
-
-            module.bindLayer(module.$navContainer.find('div[data-role="slidernav-root"]'));
-
-            module.$navContainer.on('click', 'div[data-role="close-layer"]', module.hideLayer);
-            module.$navContainer.on('click', 'div[data-parent="false"]', module.itemClick);
-            module.$navContainer.on('click', 'div[data-parent="true"]', module.parentClick);
         }
+
     };
 
     window.sliderNav = {
