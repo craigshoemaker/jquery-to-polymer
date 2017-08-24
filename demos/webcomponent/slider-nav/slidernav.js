@@ -64,7 +64,8 @@
         },
 
         bindLayer: function(layer, navPath) {
-            var items, path;
+            var items, path, newPath, isParent, itemElement;
+            
 
             if(!module.navData) {
                 return;
@@ -79,8 +80,6 @@
             }
 
             items.forEach(function(item, index) {
-                var newPath, isParent, itemElement;
-
                 newPath = path.concat([index.toString()]);
                 isParent = false;
 
@@ -166,19 +165,19 @@
         },
 
         hideLayer: function(e) {
-            var parentSelector, parent, parentnavPath;
+            var parentSelector, parent, parentNavPath;
 
             parentSelector = '#' + e.target.parentElement.getAttribute('id');
             parent = module.component.querySelector(parentSelector);
             parent.classList.remove('show');
 
-            parentnavPath = parent.getAttribute('data-nav-path');
-            module.removeLastLayer(parentnavPath);
+            parentNavPath = parent.getAttribute('data-nav-path');
+            module.removeLastLayer(parentNavPath);
         },
 
-        removeLastLayer: function(parentnavPath) {
+        removeLastLayer: function(parentNavPath) {
             setTimeout(function() {
-                module.navContainer.querySelector('.layer[data-nav-path^="' + parentnavPath + '"]').remove();    
+                module.navContainer.querySelector('.layer[data-nav-path^="' + parentNavPath + '"]').remove();    
             }, 1000); // allow enough time for close animation to complete
         },
 
