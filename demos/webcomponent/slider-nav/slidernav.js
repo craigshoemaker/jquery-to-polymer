@@ -9,23 +9,58 @@
         id: 0,
         navData: {},
 
-        getItems: function(path, parent) {
-            var isRoot, level;
-            
-            // clone path
-            path = JSON.parse(JSON.stringify(path));
+        bootstrap: function() {
+            var component, template, root, proto, script;
 
-            path.forEach(function(pathIndex, loopIndex) {
-                isRoot = (loopIndex === 0);
+            proto = Object.create(HTMLElement.prototype);
+            script = document.currentScript.ownerDocument;
 
-                if(isRoot){
-                    level = parent[pathIndex];
-                } else {
-                    level = level.children[pathIndex];
+            proto.createdCallback = function() {
+                template = script.querySelector('template');
+                component = document.importNode(template.content, true);
+                root = this.createShadowRoot();
+                
+                component.getElementById('title').innerText = this.getAttribute('title');
+
+                root.appendChild(component);
+
+                this.addEventListener('data', function(e) {
+                    module.init(e.detail, root);
+                });
+            };
+
+            document.registerElement('slider-nav', { prototype: proto });
+        },
+
+        init: function(navData, component) {
+
+            module.component = component;
+
+            module.navContainer = module.component.querySelector('div[data-role="container"]');
+            module.navData = navData;
+
+            module.bindLayer(module.navContainer.querySelector('div[data-role="root"]'));
+
+            module.navContainer.addEventListener('click', function(e){
+
+                var currentTarget, isItem, isParent, isCloseLayer;
+
+                currentTarget = e.target;
+                isItem = currentTarget.classList.contains('item');
+                isCloseLayer = currentTarget.getAttribute('data-role') === 'close-layer';
+
+                if(isItem || isCloseLayer){
+                    isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
+
+                    if(isCloseLayer) {
+                        module.hideLayer(e);
+                    } else if(isParent) {
+                        module.parentClick(e);
+                    } else {
+                        module.itemClick(e);
+                    }
                 }
             });
-
-            return level.children;
         },
 
         bindLayer: function(layer, navPath) {
@@ -63,6 +98,41 @@
             });
 
             return layer;
+        },
+
+        getItems: function(path, parent) {
+            var isRoot, level;
+            
+            // clone path
+            path = JSON.parse(JSON.stringify(path));
+
+            path.forEach(function(pathIndex, loopIndex) {
+                isRoot = (loopIndex === 0);
+
+                if(isRoot){
+                    level = parent[pathIndex];
+                } else {
+                    level = level.children[pathIndex];
+                }
+            });
+
+            return level.children;
+        },
+
+        parentClick: function(e){
+            var target, selectedItems, title;
+
+            target = e.target;
+
+            selectedItems = target.parentElement.querySelector('.item-selected');
+            if(selectedItems) {
+                selectedItems.classList.remove('item-selected');
+            }
+
+            target.classList.add('item-selected');
+
+            title = target.innerText; 
+            module.addLayer(target.getAttribute('data-nav-path'), title);
         },
 
         addLayer: function(navPath, parentTitle) {
@@ -112,22 +182,6 @@
             }, 1000); // allow enough time for close animation to complete
         },
 
-        parentClick: function(e){
-            var target, selectedItems, title;
-
-            target = e.target;
-
-            selectedItems = target.parentElement.querySelector('.item-selected');
-            if(selectedItems) {
-                selectedItems.classList.remove('item-selected');
-            }
-
-            target.classList.add('item-selected');
-
-            title = target.innerText; 
-            module.addLayer(target.getAttribute('data-nav-path'), title);
-        },
-
         itemClick: function(e){
             var target, selected, args, event;
 
@@ -157,60 +211,6 @@
              });
 
             module.navContainer.dispatchEvent(event);
-        },
-
-        init: function(navData, component) {
-
-            module.component = component;
-
-            module.navContainer = module.component.querySelector('div[data-role="container"]');
-            module.navData = navData;
-
-            module.bindLayer(module.navContainer.querySelector('div[data-role="root"]'));
-
-            module.navContainer.addEventListener('click', function(e){
-
-                var currentTarget, isItem, isParent, isCloseLayer;
-
-                currentTarget = e.target;
-                isItem = currentTarget.classList.contains('item');
-                isCloseLayer = currentTarget.getAttribute('data-role') === 'close-layer';
-
-                if(isItem || isCloseLayer){
-                    isParent = /true/i.test(currentTarget.getAttribute('data-parent'));
-
-                    if(isCloseLayer) {
-                        module.hideLayer(e);
-                    } else if(isParent) {
-                        module.parentClick(e);
-                    } else {
-                        module.itemClick(e);
-                    }
-                }
-            });
-        },
-
-        bootstrap: function() {
-            var component, template, root, proto, script;
-
-            proto = Object.create(HTMLElement.prototype);
-            script = document.currentScript.ownerDocument;
-
-            proto.createdCallback = function() {
-                template = script.querySelector('template');
-                component = document.importNode(template.content, true);
-                root = this.createShadowRoot();
-                
-                component.getElementById('title').innerText = this.getAttribute('title');
-
-                root.appendChild(component);
-
-                this.addEventListener('data', function(e) {
-                    module.init(e.detail, root);
-                });
-            };
-
-            document.registerElement('slider-nav', { prototype: proto });
         }
     };
 

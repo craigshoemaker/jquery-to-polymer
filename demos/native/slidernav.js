@@ -9,23 +9,27 @@
         navData: {},
         individualItemCallback: function() {},
 
-        getItems: function(path, parent) {
-            var isRoot, level;
+        init: function(navData, callback) {
             
-            // clone path
-            path = JSON.parse(JSON.stringify(path));
+            module.navContainer = document.querySelector('div[data-role="slidernav-container"]');
+            module.navData = navData;
+            module.individualItemCallback = callback;
 
-            path.forEach(function(pathIndex, loopIndex) {
-                isRoot = (loopIndex === 0);
+            module.bindLayer(module.navContainer.querySelector('div[data-role="slidernav-root"]'));
 
-                if(isRoot){
-                    level = parent[pathIndex];
-                } else {
-                    level = level.children[pathIndex];
+            module.navContainer.addEventListener('click', function(e){
+
+                var currentTarget = e.target;
+
+                if(currentTarget.getAttribute('data-role') === 'close-layer') {
+                    module.hideLayer(e);
+                } else if(currentTarget.getAttribute('data-parent') === 'false') {
+                    module.itemClick(e);
+                } else if(currentTarget.getAttribute('data-parent') === 'true') {
+                    module.parentClick(e);
                 }
-            });
 
-            return level.children;
+            });
         },
 
         bindLayer: function(layer, navPath) {
@@ -57,6 +61,41 @@
             });
 
             return layer;
+        },
+
+        getItems: function(path, parent) {
+            var isRoot, level;
+            
+            // clone path
+            path = JSON.parse(JSON.stringify(path));
+
+            path.forEach(function(pathIndex, loopIndex) {
+                isRoot = (loopIndex === 0);
+
+                if(isRoot){
+                    level = parent[pathIndex];
+                } else {
+                    level = level.children[pathIndex];
+                }
+            });
+
+            return level.children;
+        },
+
+        parentClick: function(e){
+            var target, selectedItems, title;
+
+            target = e.target;
+
+            selectedItems = target.parentElement.querySelector('.slidernav-item-selected');
+            if(selectedItems) {
+                selectedItems.classList.remove('slidernav-item-selected');
+            }
+
+            target.classList.add('slidernav-item-selected');
+
+            title = target.innerText; 
+            module.addLayer(target.getAttribute('data-nav-path'), title);
         },
 
         addLayer: function(navPath, parentTitle) {
@@ -106,22 +145,6 @@
             }, 1000); // allow enough time for close animation to complete
         },
 
-        parentClick: function(e){
-            var target, selectedItems, title;
-
-            target = e.target;
-
-            selectedItems = target.parentElement.querySelector('.slidernav-item-selected');
-            if(selectedItems) {
-                selectedItems.classList.remove('slidernav-item-selected');
-            }
-
-            target.classList.add('slidernav-item-selected');
-
-            title = target.innerText; 
-            module.addLayer(target.getAttribute('data-nav-path'), title);
-        },
-
         itemClick: function(e){
             var target, selected, args;
 
@@ -144,30 +167,8 @@
             };
 
             module.individualItemCallback(e, args);
-        },
-
-        init: function(navData, callback) {
-            
-            module.navContainer = document.querySelector('div[data-role="slidernav-container"]');
-            module.navData = navData;
-            module.individualItemCallback = callback;
-
-            module.bindLayer(module.navContainer.querySelector('div[data-role="slidernav-root"]'));
-
-            module.navContainer.addEventListener('click', function(e){
-
-                var currentTarget = e.target;
-
-                if(currentTarget.getAttribute('data-role') === 'close-layer') {
-                    module.hideLayer(e);
-                } else if(currentTarget.getAttribute('data-parent') === 'false') {
-                    module.itemClick(e);
-                } else if(currentTarget.getAttribute('data-parent') === 'true') {
-                    module.parentClick(e);
-                }
-
-            });
         }
+        
     };
 
     window.sliderNav = {
