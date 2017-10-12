@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "http-server -o",
-    "preinstall": "npm install bower"
+    "preinstall": "npm install bower -g & bower install"
   },
   "keywords": [
     "HTML5",
