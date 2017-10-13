@@ -8,7 +8,7 @@ a native Web Component and finally as a Polymer.js component.
 
 First, clone the repo:
 
-    git clone https://github.com/craigshoemaker/jquery-to-polymer.git
+    git clone https://github.com/craigshoemaker/jquery-to-polymer
 
 Then, change folders:
 
