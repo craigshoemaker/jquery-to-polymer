@@ -20,13 +20,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                var slider = document.getElementById('slider');
 
-                slider.addEventListener('itemselected', function(e){
-                    console.log(e.detail.ui, e.detail.data);
-                });
-
-                slider.dispatchEvent(new CustomEvent('data', { detail: window.navData }));
  
             });
         </script>
