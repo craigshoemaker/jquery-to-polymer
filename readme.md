@@ -16,7 +16,8 @@ Then, change into the folder:
 
 Next, install the dependencies:
 
-    npm install
+    1. npm install
+    2. bower install bootstrap
 
 Finally, run the application:
 
